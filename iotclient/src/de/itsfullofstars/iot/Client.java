@@ -66,7 +66,7 @@ public class Client {
 	 *   "Value": "9", 
 	 *   "SensorDetails": {
 	 *    "__metadata": {
-	 *    	"uri":"http://localhost:7080/iot/olingo.svc/Sensors(1L)" } 
+	 *    	"uri":"http://localhost:7080/iotserver/olingo.svc/Sensors(1L)" } 
 	 *   } 
 	 * }
 	 * 
@@ -76,7 +76,7 @@ public class Client {
 	public static JSONObject convertToJson(double temp) {
 		log.log(Level.FINEST, "convertToJson");
 		JSONObject metadata = new JSONObject();
-		metadata.put("uri", "http://localhost:7080/iot/olingo.svc/Sensors(1L)");
+		metadata.put("uri", "http://localhost:7080/iotserver/olingo.svc/Sensors(1L)");
 		JSONObject sensorDetails = new JSONObject();
 		sensorDetails.put("__metadata", metadata);
 		JSONObject jo = new JSONObject();

@@ -26,11 +26,11 @@ public class IoTSensor {
 	CloseableHttpClient httpclient = HttpClients.createDefault();
 	HttpPost httpPost = null;
 
-	// POST data to URL: http://localhost:7080//iot/olingo.svc/Measurements
+	// POST data to URL: http://localhost:7080/iotserver/olingo.svc/Measurements
 	private static final String SCHEME = "http";
 	private static final String HOST = "localhost";
 	private static final int 	PORT = 7080;
-	private static final String PATH = "/iot/olingo.svc/Sensors";
+	private static final String PATH = "/iotserver/olingo.svc/Sensors";
 
 	/**
 	 * Constructor
