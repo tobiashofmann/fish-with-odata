@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+
+		<style>
+		body {
+			font: 10px sans-serif;
+		}
+		
+		.axis path, .axis line {
+			fill: none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+		}
+		
+		.line {
+			fill: none;
+			stroke: steelblue;
+			stroke-width: 1.5px;
+		}
+		</style>
+		<title>Sensor measurment visualization</title>
+	</head>
+	<body>
+	
+		<div id="visualisation"></div>
+		
+		<!-- load external Javascript needed for app: D3 and jQuery  -->
+		<script src="js/d3.v3.min.js"></script>
+		<script src="js/jquery-2.2.3.min.js"></script>
+		
+		<script type="text/javascript">		
+			var margin = {
+					top : 20,
+					right : 20,
+					bottom : 30,
+					left : 50
+			};
+			var width = 560 - margin.left - margin.right;
+			var height = 400 - margin.top- margin.bottom;
+						
+			var svg = d3.select("body")
+				.append("svg")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom)
+			  	.append("g")
+			    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			/**
+			Extract the needed information for the chart from the returned OData server
+			- Value 
+			- CreatedAt
+			*/
+			function processJson(data) {
+				//console.log("processJson");
+				//console.log("length of JSON object: " + data.d.results.length);
+				var retVal = [];
+				
+				for (var i = 0; i < data.d.results.length; i++) {
+					var dummy = {};											
+					var sDate = new Date(parseInt(data.d.results[i].CreatedAt.substr(6)));
+					
+					dummy.date = sDate;
+					dummy.Value = data.d.results[i].Value;
+					//console.log("created at: " + dummy.date + " Value: " + dummy.Value);
+					retVal.push(dummy);
+				}
+				return retVal;
+			};
+			/**
+			Transform the received measurement dates into a JSON Array containing only the dates
+			*/
+			function getDates(data){
+				var dates = [];
+				for (var i = 0; i < data.d.results.length; i++) {
+					var sDate = new Date(parseInt(data.d.results[i].CreatedAt.substr(6)));
+					dates.push(new Date(sDate));
+				}
+				//console.log(dates);
+				return dates;
+			};
+			
+			function drawChart(data) {
+				//console.log(data);
+				
+				var newJson = processJson(data);
+				var dates = getDates(data);
+				
+				var maxDate=new Date(Math.max.apply(null,dates));
+				var minDate=new Date(Math.min.apply(null,dates));
+				console.log("max Date: " + maxDate);
+				console.log("min Date: " + minDate);
+				console.log("max y value: "+ d3.max(newJson, function(d) {return d.Value;}));
+				
+				var x = d3.time.scale().domain([new Date(minDate), new Date(maxDate)]).rangeRound([0, width]);				
+				//var y = d3.scale.linear().domain([0, d3.max(newJson, function(d) {return d.Value; })]).range([ height, 0 ]);
+				var y = d3.scale.linear().domain([0, 45]).range([ height, 0 ]);
+				
+				// redraw them with new values
+				var xAxis = d3.svg.axis()
+						.scale(x)
+						.orient("bottom")
+						.ticks(d3.time.seconds, 30)
+						.tickFormat(d3.time.format("%H:%M:%S"))
+					    .tickSize(0)
+					    .tickPadding(8);				
+				var yAxis = d3.svg.axis().scale(y).orient("left").tickPadding(8);
+				
+				var line = d3.svg.line()
+				    	.x(function(d) { return x(new Date(d.date)); })
+				    	.y(function(d) { return y(d.Value); });
+	
+				svg.append('g')
+				    .attr('class', 'x axis')
+				    .attr("transform", "translate(0," + height + ")")
+				    .call(xAxis)
+				    .selectAll("text")  
+		            .style("text-anchor", "end")
+		            .attr("dx", "-.8em")
+		            .attr("dy", ".15em")
+		            .attr("transform", "rotate(-90)" );
+					
+				svg.append("g")
+			      .attr("class", "y axis")
+			      .call(yAxis)
+		  	      .append("text")
+			      .attr("transform", "rotate(-90)")
+			      .attr("y", 6)
+			      .attr("dy", ".71em")
+			      .style("text-anchor", "end")
+			      .text("Temp");
+				svg.append("path")
+			      .datum(newJson)
+			      .attr("class", "line")
+			      .attr("d", line);
+					
+			};			
+				
+			/** 
+			call the measurements service and draw the chart.
+			*/
+			function callService(){				
+				$.ajax({
+					  url: "/iotserver/olingo.svc/Sensors(1L)/MeasurementDetails?$format=json",
+					  method: "GET",
+					  async: true,
+					  success: drawChart,
+					  error: function(){alert("Ooooops");}			  
+					});
+			};
+			callService();
+								
+		</script>
+	</body>
+</html>
