@@ -21,11 +21,11 @@
 		<sap.cloud.application>sample</sap.cloud.application>
 		<local.server.root>${project.build.directory}/server</local.server.root>
 		<local.server.host>localhost</local.server.host>
-		<local.server.shutdown.port>9003</local.server.shutdown.port>
-		<local.server.jmx.port>9004</local.server.jmx.port>
-		<local.server.http.port>9080</local.server.http.port>
-		<local.server.https.port>9443</local.server.https.port>
-		<local.server.ajp.port>9009</local.server.ajp.port>
+		<local.server.shutdown.port>7003</local.server.shutdown.port>
+		<local.server.jmx.port>7004</local.server.jmx.port>
+		<local.server.http.port>7080</local.server.http.port>
+		<local.server.https.port>7443</local.server.https.port>
+		<local.server.ajp.port>7009</local.server.ajp.port>
 		<eclipselink.version>2.6.2</eclipselink.version>
 		<version.jaxrs-api>2.0.1</version.jaxrs-api>
 		<olingo.version>2.0.6</olingo.version>
