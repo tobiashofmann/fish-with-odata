@@ -12,6 +12,7 @@
 	<properties>
 		<!-- SONAR -->
 		<sonar.language>java</sonar.language>
+		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sap.cloud.sdk.path>${project.basedir}/sdk</sap.cloud.sdk.path>
 		<sap.cloud.sdk.version>2.79.10.4</sap.cloud.sdk.version>
@@ -31,7 +32,8 @@
 		<olingo.version>2.0.6</olingo.version>
 		<version.cxf>2.7.6</version.cxf>
 		<version.jaxrs-api>2.0-m10</version.jaxrs-api>
-		<junit.version>4.12</junit.version>
+		<junit.version>5.2.0</junit.version>
+		<junit.platform.version>1.2.0</junit.platform.version>
 	</properties>
 
 	<dependencies>
@@ -118,90 +120,45 @@
 		</dependency>
 
 		<!-- jUnit -->
+		
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
+		    <groupId>org.junit.jupiter</groupId>
+		    <artifactId>junit-jupiter-api</artifactId>
+		    <version>${junit.version}</version>
+		    <scope>test</scope>
 		</dependency>
-
-
-
-
+		    <dependency>
+		    <groupId>org.junit.jupiter</groupId>
+		    <artifactId>junit-jupiter-engine</artifactId>
+		    <version>${junit.version}</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.junit.vintage</groupId>
+		    <artifactId>junit-vintage-engine</artifactId>
+		    <version>${junit.version}</version>
+		    <scope>test</scope>
+		    </dependency>
+		<dependency>
+		    <groupId>org.junit.platform</groupId>
+		    <artifactId>junit-platform-launcher</artifactId>
+		    <version>${junit.platform.version}</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.junit.platform</groupId>
+		    <artifactId>junit-platform-runner</artifactId>
+		    <version>${junit.platform.version}</version>
+		    <scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
-		<!-- Map the Eclipse file system layout to the Maven plug-ins -->
-		<sourceDirectory>${project.basedir}/src</sourceDirectory>
-		<testSourceDirectory>${project.basedir}/test</testSourceDirectory>
 		<outputDirectory>${project.basedir}/war/WEB-INF/classes</outputDirectory>
 		<testOutputDirectory>${project.basedir}/bin/classes</testOutputDirectory>
-		<resources>
-			<resource>
-				<directory>${project.basedir}/src</directory>
-				<includes>
-					<include>**/*</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>${project.basedir}/test</directory>
-				<includes>
-					<include>**/*</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</testResource>
-		</testResources>
+
 		<plugins>
 
-			<!-- Install the HCP SDK -->
-			<plugin>
-				<groupId>com.sap.cloud</groupId>				 
-				<artifactId>neo-javaee6-wp-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>install-sdk</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>install-sdk</goal>
-						</goals>
-					</execution>
-					<execution>
-                         <id>local-setup</id>
-                         <phase>pre-integration-test</phase>
-                         <goals>
-                             <goal>install-local</goal>
-                             <goal>deploy-local</goal>
-                             <goal>start-local</goal>
-                         </goals>
-                     </execution>
-                     <execution>
-                         <id>local-teardown</id>
-                         <phase>post-integration-test</phase>
-                         <goals>
-                             <goal>stop-local</goal>
-                         </goals>
-                     </execution>
-				</executions>
-				<configuration>
-					<sdkInstallPath>${project.build.directory}/sdk</sdkInstallPath>
-					<!-- Configuration for local server -->
-                    <location>${project.build.directory}/sdk/server</location>
-                     <!-- WAR of the application under test -->
-                    <source>${project.build.directory}/${project.artifactId}.war</source>
-                    <synchronous>true</synchronous>
-                    <httpPort>${local.server.http.port}</httpPort>
-                    <httpsPort>${local.server.https.port}</httpsPort>
-                    <ajpPort>${local.server.ajp.port}</ajpPort>
-                    <jmxPort>${local.server.jmx.port}</jmxPort>
-                    <shutdownPort>${local.server.shutdown.port}</shutdownPort>
-				</configuration>
-			</plugin>
 			<!-- Map the Eclipse file system layout to the Maven plug-ins -->
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
@@ -214,92 +171,35 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<!-- Set compiler to officially supported JDK version for the given SAP 
-				HANA Cloud Platform SDK -->
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5</version>
-				<configuration>
-					<source>${sap.cloud.jdk.version}</source>
-					<target>${sap.cloud.jdk.version}</target>
-					<showDeprecation>true</showDeprecation>
-					<showWarnings>true</showWarnings>
-				</configuration>
-			</plugin>
-			<!-- Include only unit tests for maven-surefire-plugin that is run in 
-				test phase -->
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.12</version>
-				<configuration>
-					<excludes>
-						<exclude>**/integrationtest/**/*Test.java</exclude>
-					</excludes>
-					<includes>
-						<include>**/test/**/*Test.java</include>
-					</includes>
-				</configuration>
+				<version>2.21.0</version>
+				<dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>${junit.platform.version}</version>
+                    </dependency>
+                </dependencies>
 			</plugin>
-
+           
 			<!-- Include only integration tests for maven-failsafe-plugin that is 
 				run in integration-test phase -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.12</version>
-				<configuration>
-					<excludes>
-						<exclude>**/test/**/*Test.java</exclude>
-					</excludes>
-					<includes>
-						<include>**/integrationtest/**/*Test.java</include>
-					</includes>
-				</configuration>
-			</plugin>
-			<!-- Enforce officially supported JDK and validated Maven version or higher -->
-			<plugin>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>1.0.1</version>
-				<executions>
-					<execution>
-						<id>enforce-maven</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireJavaVersion>
-									<version>[${sap.cloud.jdk.version},2.0)</version>
-								</requireJavaVersion>
-								<requireMavenVersion>
-									<version>[3.0.3, 4.0.0)</version>
-								</requireMavenVersion>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<!-- jMeter -->
-			<plugin>
-			    <groupId>com.lazerycode.jmeter</groupId>
-			    <artifactId>jmeter-maven-plugin</artifactId>
-			    <version>1.10.1</version>
-			    <executions>
-			        <execution>
-			            <id>jmeter-tests</id>			            
-			            <phase>verify</phase>			
-			            <!--              
-			            <phase>integration-test</phase>
-			             -->
-			            <goals>
-			                <goal>jmeter</goal>
-			            </goals>
-			            <configuration>
-			       			<testFilesDirectory>${project.basedir}/test/jmeter</testFilesDirectory>
-                        </configuration>
-			       </execution>			       					      
-			    </executions>
-			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -311,60 +211,9 @@
 			    </plugin>
 				<!-- Define the version of the Maven Plugin for SAP HANA Cloud Platform 
 					we want to use -->
-				<plugin>
-					<groupId>com.sap.cloud</groupId>
-					<artifactId>${sap.cloud.sdk.plugin}</artifactId>
-					<version>${sap.cloud.sdk.version}</version>
-				</plugin>
 
 				<!-- Force m2e to ignore plugin goal that it doesn't support naturally -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-enforcer-plugin
-										</artifactId>
-										<versionRange>
-											[0.0.1,)
-										</versionRange>
-										<goals>
-											<goal>enforce</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>com.sap.cloud</groupId>
-										<artifactId>
-											neo-javaee6-wp-maven-plugin
-										</artifactId>
-										<versionRange>
-											[2.79.10.4,)
-										</versionRange>
-										<goals>
-											<goal>install-sdk</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
+				
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -372,26 +221,10 @@
 	<reporting>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.4-SNAPSHOT</version>
-				<configuration>
-					<effort>Max</effort>
-					<threshold>Low</threshold>
-					<xmlOutput>true</xmlOutput>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-	               <formats>
-	                   <format>html</format>
-	                   <format>xml</format>
-	               </formats>
-            </configuration>
-			</plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.1</version>            
+            </plugin>
 		</plugins>
 	</reporting>
 
