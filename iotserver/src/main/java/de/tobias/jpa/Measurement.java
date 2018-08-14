@@ -43,7 +43,7 @@ public class Measurement implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.TABLE)
 	@Column(name = "ID")
-	private Long id;
+	private long id;
 	
 	private String unit;
 	
@@ -64,7 +64,7 @@ public class Measurement implements Serializable {
 	/**
 	 * @return the id
 	 */
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -72,7 +72,7 @@ public class Measurement implements Serializable {
 	 * @param id
 	 *            the id to set
 	 */
-	public void setId(Long id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
